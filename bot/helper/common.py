@@ -96,6 +96,7 @@ class TaskConfig:
         self.drive_id = ""
         self.leech_dest = ""
         self.cmd_up_dest = ""
+        self.dump_dest = ""
         self.rc_flags = ""
         self.tag = ""
         self.name = ""
@@ -494,6 +495,18 @@ class TaskConfig:
                 self.transmission_mode = "both"
 
             self.up_dest = Config.LEECH_DUMP_CHAT
+            if self.dump_dest:
+                dump_chats = Config.LEECH_DUMP_CHATS or {}
+                self.up_dest = dump_chats.get(self.dump_dest)
+                if self.up_dest is None:
+                    raw_id = str(self.dump_dest).lstrip("-").isdigit()
+                    if raw_id or self.dump_dest.startswith("@"):
+                        self.up_dest = self.dump_dest
+                    else:
+                        raise ValueError(
+                            f"Unknown dump chat '{self.dump_dest}'! "
+                            f"Configured dumps: {', '.join(dump_chats) or 'none'}"
+                        )
             if self.up_dest:
                 if not isinstance(self.up_dest, int):
                     if "|" in str(self.up_dest):
